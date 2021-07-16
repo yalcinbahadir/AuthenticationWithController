@@ -1,0 +1,68 @@
+﻿@page "/register"
+@using System.Text;
+    @if (ShowMessageBox)
+    {
+        <MessageBox Color="@AlertType" Message="@Message" />
+    }
+
+
+    <h3>Register</h3>
+    <EditForm Model="@Model" OnValidSubmit="HandelValidSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="form-group">
+            <label>Email</label>
+            <InputText class="form-control" @bind-Value="Model.Email" />
+        </div>
+        <div class="form-group">
+            <label>Password</label>
+            <InputText class="form-control" @bind-Value="Model.Password" />
+        </div>
+        <div class="form-group">
+            <label>ConfirmPassword</label>
+            <InputText class="form-control" @bind-Value="Model.ConfirmPassword" />
+        </div>
+        <input type="submit" value="Register" class="btn btn-primary"/>
+    </EditForm>
+    @code {
+
+        public RegisterModel Model { get; set; }
+        [Inject]
+        public UserManager<IdentityUser> UserManager { get; set; }
+        [Inject]
+        public NavigationManager NavigationManager { get; set; }
+
+        public bool ShowMessageBox { get; set; } = false;
+        public string Message { get; set; }
+        public string AlertType { get; set; }
+
+        protected override void OnInitialized()
+        {
+            Model = new RegisterModel();
+            base.OnInitialized();
+        }
+
+        private async Task HandelValidSubmit()
+        {
+            var user = new IdentityUser { Email = Model.Email, UserName = Model.Email };
+            var result = await UserManager.CreateAsync(user, Model.Password);
+            if (result.Succeeded)
+            {
+                NavigationManager.NavigateTo("/login");
+            }
+            else
+            {
+                ShowMessageBox = true;
+                foreach (var error in result.Errors)
+                {
+
+                    Message += error.Description + "\r\n";
+
+                }
+
+                AlertType = "danger";
+
+            }
+        }
+
+    }

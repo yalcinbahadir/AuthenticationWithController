@@ -1,0 +1,38 @@
+﻿@inherits LayoutComponentBase
+
+<div class="page">
+    <div class="sidebar">
+        <NavMenu />
+    </div>
+
+    <div class="main">
+        <div class="top-row px-4">
+            <AuthorizeView>
+                <Authorized>
+                    <a href="#">Hello, @context.User.Identity.Name</a>
+                    <form action="cookie/Logout" method="post">
+                        <input type="submit" value="Logout" class="btn-link bt"/>                      
+                    </form>                  
+                </Authorized>
+                <NotAuthorized>
+                    <a href="login">Login</a>
+                    <a href="register">Register</a>
+                </NotAuthorized>
+            </AuthorizeView>         
+            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
+        </div>
+
+        <div class="content px-4">
+            @Body
+        </div>
+    </div>
+</div>
+
+@code{
+    [Inject]
+    public SignInManager<IdentityUser> SignInManager { get; set; }
+    private async Task Logout()
+    {
+        await SignInManager.SignOutAsync();
+    }
+}
